@@ -1,0 +1,60 @@
+*
+{
+	font-family: Arial;
+}
+
+body
+{
+	margin: 0;
+	height: 100vh;
+}
+
+.container
+{
+	height: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+}
+
+.board
+{
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+}
+
+.board__item
+{
+	background-color: white;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	outline: 1px solid black;
+	transition: background-color .1s ease-out, box-shadow .3s ease-out;
+	width: 120px;
+	height: 120px;
+	font-weight: bold;
+	font-size: 24px;
+}
+
+.board__item--winner
+{
+	box-shadow: inset 0px 0px 18px yellow;
+}
+
+.board__item--avail:hover
+{
+	background-color: #E2E2E2;
+	cursor: pointer;
+}
+
+.mark-x
+{
+	background-color: #FFCCCC;
+}
+
+.mark-o
+{
+	background-color: #CCFFCC;
+}
