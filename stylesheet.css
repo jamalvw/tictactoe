@@ -1,12 +1,17 @@
 *
 {
 	font-family: Arial;
+	margin: 0;
 }
 
 body
 {
-	margin: 0;
 	height: 100vh;
+}
+
+button
+{
+	padding: 12px 20px;
 }
 
 .container
@@ -16,6 +21,7 @@ body
 	align-items: center;
 	justify-content: center;
 	flex-direction: column;
+	gap: 16px;
 }
 
 .board
@@ -31,7 +37,7 @@ body
 	align-items: center;
 	justify-content: center;
 	outline: 1px solid black;
-	transition: background-color .1s ease-out, box-shadow .3s ease-out;
+	transition: background-color .1s ease-out, box-shadow .3s ease-out, outline .3s ease-out;
 	width: 120px;
 	height: 120px;
 	font-weight: bold;
@@ -40,7 +46,8 @@ body
 
 .board__item--winner
 {
-	box-shadow: inset 0px 0px 18px yellow;
+	z-index: 1;
+	box-shadow: 0px 0px 8px black, inset 0px 0px 12px black;
 }
 
 .board__item--avail:hover

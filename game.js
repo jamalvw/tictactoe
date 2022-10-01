@@ -1,35 +1,8 @@
-const playerFactory = (name, symbol, aiControlled) =>
-{
-	return { name, symbol, aiControlled };
-};
+const randomArrayItem = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
-const players = [playerFactory('Player 1', 'X', false), playerFactory('Player 2', 'O', false)];
+const arrayEquals = (arr1, arr2) => arr1.every((v, i) => v == arr2[i]);
 
-const gameboard = (() =>
-{
-	const size = 3;
-	const board = [];
-
-	const init = () =>
-	{
-		// Fill gameboard with empty strings 
-		for (let y = 0; y < size; y++)
-		{
-			board[y] = [];
-			for (let x = 0; x < size; x++)
-				board[y].push('');
-		}
-	};
-
-	const get = (x, y) => board[x][y];
-	const set = (x, y, value) => board[x][y] = value;
-	
-	const getAllItemHtmls = () => document.querySelectorAll('.board__item');
-
-	return { size, init, get, set, getAllItemHtmls, };
-})();
-
-const game = (() =>
+const gameFactory = () =>
 {
 	let state = '';
 	let winPositions = null;
@@ -51,7 +24,19 @@ const game = (() =>
 		// If we're out of players, loop back to the beginning
 		if (currentPlayerIndex >= players.length)
 			currentPlayerIndex = 0;
-		updateDisplay();
+
+
+		// TEMPORARY AI player controller
+
+		let tries = 0;
+		while (currentPlayer().aiControlled && tries < 10 && state === 'playing')
+		{
+			tries++;
+			const position = randomArrayItem(gameboard.availablePositions());
+			mark(position[0], position[1]);
+		}
+
+		if (tries > 10) console.log('The AI seems to have crashed...');
 	};
 
 	const currentPlayer = () => players[currentPlayerIndex];
@@ -62,9 +47,14 @@ const game = (() =>
 
 		winPositions = matchDiagForward() || matchDiagBackward() || matchRight() || matchDown();
 
-		if (winPositions) state = 'ended';
+		if (winPositions)
+			state = 'win';
+		else if (gameboard.isFull())
+			state = 'tie';
+		else
+			nextTurn();
 
-		nextTurn();
+		updateDisplay();
 	};
 
 	const matchDiagForward = () =>
@@ -167,8 +157,6 @@ const game = (() =>
 
 	const getStateHtml = () => document.querySelector('.state');
 
-	const arrayEquals = (arr1, arr2) => arr1.every((v, i) => v == arr2[i]);
-
 	const updateDisplay = () =>
 	{
 		const player = currentPlayer();
@@ -178,8 +166,11 @@ const game = (() =>
 			case 'playing':
 				getStateHtml().textContent = `${player.name}'s Turn`;
 				break;
-			case 'ended':
-				getStateHtml().textContent = `Game over!`;
+			case 'win':
+				getStateHtml().textContent = `${player.name} wins!`;
+				break;
+			case 'tie':
+				getStateHtml().textContent = `It's a draw!`;
 				break;
 		}
 
@@ -206,8 +197,8 @@ const game = (() =>
 					break;
 			}
 
-			// Add win class if the game ended and this is a winning position
-			if (state === 'ended' && winPositions.some(v => arrayEquals(v, [x, y])))
+			// Add win class if the game is won and this is a winning position
+			if (state === 'win' && winPositions.some(v => arrayEquals(v, [x, y])))
 				htmlItem.classList.add('board__item--winner');
 
 			// If the game is playing, it's a user-controlled player's turn, and the spot isn't marked, make it available
@@ -222,6 +213,56 @@ const game = (() =>
 	};
 
 	return { start };
+};
+
+const playerFactory = (name, symbol, aiControlled) =>
+{
+	return { name, symbol, aiControlled };
+};
+
+let game = gameFactory();
+let players = [playerFactory('Player', 'X', false), playerFactory('Computer', 'O', true)];
+
+const gameboard = (() =>
+{
+	const size = 3;
+	const board = [];
+
+	const init = () =>
+	{
+		// Fill gameboard with empty strings 
+		for (let y = 0; y < size; y++)
+		{
+			board[y] = [];
+			for (let x = 0; x < size; x++)
+				board[y].push('');
+		}
+	};
+
+	const get = (x, y) => board[x][y];
+	const set = (x, y, value) => board[x][y] = value;
+
+	const availablePositions = () =>
+	{
+		const positions = [];
+		for (let x = 0; x < gameboard.size; x++)
+			for (let y = 0; y < gameboard.size; y++)
+				if (board[x][y] === '') positions.push([x, y]);
+		return positions;
+	}
+
+	const isFull = () =>
+	{
+		return availablePositions().length === 0;
+	}
+	
+	const getAllItemHtmls = () => document.querySelectorAll('.board__item');
+
+	return { size, init, get, set, availablePositions, isFull, getAllItemHtmls, };
 })();
 
-game.start();
+document.querySelector('.new-game').onclick = () =>
+{
+	game = gameFactory();
+	game.start();
+}
