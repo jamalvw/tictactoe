@@ -221,7 +221,7 @@ const playerFactory = (name, symbol, aiControlled) =>
 };
 
 let game = gameFactory();
-let players = [playerFactory('Player', 'X', false), playerFactory('Computer', 'O', true)];
+let players = [];
 
 const gameboard = (() =>
 {
@@ -261,8 +261,16 @@ const gameboard = (() =>
 	return { size, init, get, set, availablePositions, isFull, getAllItemHtmls, };
 })();
 
-document.querySelector('.new-game').onclick = () =>
+document.querySelector('.new-vs-ai').onclick = () =>
 {
+	players = [playerFactory('Player', 'X', false), playerFactory('Computer', 'O', true)];
+	game = gameFactory();
+	game.start();
+}
+
+document.querySelector('.new-vs-friend').onclick = () =>
+{
+	players = [playerFactory('Player 1', 'X', false), playerFactory('Player 2', 'O', false)];
 	game = gameFactory();
 	game.start();
 }
