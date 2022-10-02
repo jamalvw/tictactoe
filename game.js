@@ -157,6 +157,8 @@ const gameFactory = () =>
 
 	const getStateHtml = () => document.querySelector('.state');
 
+	const getPlayersHtml = () => document.querySelector('.players');
+
 	const updateDisplay = () =>
 	{
 		const player = currentPlayer();
@@ -173,6 +175,8 @@ const gameFactory = () =>
 				getStateHtml().textContent = `It's a draw!`;
 				break;
 		}
+
+		getPlayersHtml().textContent = players.map((p) => p.name).join(' vs. ');
 
 		// Loop through each HTML item in the gameboard
 		for (const htmlItem of gameboard.getAllItemHtmls())
